@@ -1,0 +1,32 @@
+name: Apply skin automatically
+
+on:
+  push:
+    paths:
+      - skin.json
+      - skins/**
+      - tools/**
+
+permissions:
+  contents: write
+
+jobs:
+  apply-skin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Apply skin
+        run: python tools/apply_skin.py
+
+      - name: Commit assets
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add www/assets
+          git commit -m "Auto apply skin assets" || echo "Nothing to commit"
+          git push
